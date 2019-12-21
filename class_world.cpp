@@ -4,13 +4,15 @@
 #include<SDL2/SDL_image.h>
 using namespace std;
 SDL_Window* window=NULL;//未來要刪掉
-
 SDL_Event  e;//未來要刪掉
 bool quit;//未來要刪掉
 SDL_Surface* hungyun=NULL;
 SDL_Surface* spotcircle=NULL;
 SDL_Renderer* world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 SDL_Rect world_rect,world_hung_rect;
+SDL_Texture* background_texture=NULL;
+SDL_Texture* hung_texture=NULL;
+SDL_Texture* spotcircle_texture=NULL;
 struct position
 {
     int x;//座標
@@ -33,12 +35,10 @@ class world
     void scene(position* now)//已修改
     {
         SDL_RenderClear(world_renderer);
-        SDL_Texture* background_texture=NULL;//背景
         background_texture=SDL_CreateTextureFromSurface(world_renderer,world_background);//背景
         SDL_RenderCopy(world_renderer,background_texture,NULL,&world_rect);//背景
         drawroute();//line
         drawspot();//spot
-        SDL_Texture* hung_texture=NULL;//宏
         world_hung_rect.x=now->x;world_hung_rect.y=now->y;//宏
         hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);//宏
         SDL_RenderCopy(world_renderer,hung_texture,NULL,&world_hung_rect);//宏
@@ -147,7 +147,17 @@ class world
     }
     void drawspot()
     {
-        //if
+        for(int i=0;i<6;i++)
+        {
+            if(spot[i].x!=0)
+            {
+                SDL_Rect spot_rect={spot[i].x-20,spot[i].y-20,40,40};
+                spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,spotcircle);
+                SDL_RenderCopy(world_renderer,spotcircle_texture,NULL,&spot_rect);
+                SDL_DestroyTexture(spotcircle_texture);
+                spotcircle_texture=NULL;
+            }
+        }
     }
     void animation(position START,position END)//缺
     {
@@ -192,14 +202,12 @@ class world
         return 1;
     }
 };
-void adjustenter(position &now)
-{
+void adjustenter(position now);
+world _world[3];
 
-}
 int main(int argc, char* argv[])
 {
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
-    world _world[3];
     //初始化world
     position now=_world[0].spot[start];
     while(!quit)
@@ -208,7 +216,7 @@ int main(int argc, char* argv[])
         _world[now._escape]._move(now);
         if(now.level!=-1)
         {
-            //呼叫關卡(如果贏了呼叫adjustenter())
+            //呼叫關卡(如果贏了呼叫adjustenter(now))
         }
         else if(now._start==1 && now._escape!=0)
         {
@@ -233,4 +241,31 @@ int main(int argc, char* argv[])
         }
     }
     return 0;
+}
+void adjustenter(position now)
+{
+    if(now.level==0)return;
+    for(int i=0;i<6;i++)
+    {
+        if(_world[now._escape].spot[i].x==now.x && _world[now._escape].spot[i].y==now.y)
+        {
+            for(int j=0;j<15;j++)
+            {
+                if(_world[now._escape].spot[i+1].x==_world[now._escape].intersect[j].x && _world[now._escape].spot[i+1].y==_world[now._escape].intersect[j].y)
+                {
+                    while(!_world[now._escape].intersect[j].enter)
+                    {
+                        _world[now._escape].intersect[j].enter=1;
+                        j--;
+                    }
+                    break;
+                }
+            }
+        }
+        if(i==three)
+        {
+            _world[now._escape+1].enterworld=1;
+        }
+        break;
+    }
 }
