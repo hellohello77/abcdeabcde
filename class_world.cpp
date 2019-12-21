@@ -70,11 +70,17 @@ class world
                             {
                             case SDLK_DOWN:
                                 if(i>start || (i==start && _help==1))
+                                {
+                                    animation(spot[i],spot[i-1],now);
                                     now=spot[i-1];
+                                }
                                 break;
                             case SDLK_UP:
                                 if(i<three || (i==three && _ending==1))
+                                {
+                                    animation(spot[i],spot[i+1],now);
                                     now=spot[i+1];
+                                }
                                 break;
                             case SDLK_SPACE:
                                 space=0;
@@ -159,11 +165,70 @@ class world
             }
         }
     }
-    void animation(position START,position END)//¯Ê
+    void animation(position START,position END,position &now)
     {
-
+        int S,E;
+        for(int i=0;i<15;i++)
+        {
+            if(START.x==intersect[i].x && START.y==intersect[i].y)
+                S=i;
+            if(END.x==intersect[i].x && END.y==intersect[i].y)
+                E=i;
+        }
+        if(E>S)
+        {
+            for(int i=S;i<E;i++)
+            {
+                if(intersect[i].x=intersect[i+1].x)
+                {
+                    while((now.y+10)<intersect[i+1].y)
+                    {
+                        now.y+=10;
+                        scene(&now);
+                    }
+                    now.y=intersect[i+1].y;
+                    scene(&now);
+                }
+                else if(intersect[i].y=intersect[i+1].y)
+                {
+                    while((now.x+10)<intersect[i+1].x)
+                    {
+                        now.x+=10;
+                        scene(&now);
+                    }
+                    now.x=intersect[i+1].x;
+                    scene(&now);
+                }
+            }
+        }
+        else if(E<S)
+        {
+            for(int i=S;i>E;i--)
+            {
+                if(intersect[i].x=intersect[i-1].x)
+                {
+                    while((now.y-10)>intersect[i-1].y)
+                    {
+                        now.y-=10;
+                        scene(&now);
+                    }
+                    now.y=intersect[i-1].y;
+                    scene(&now);
+                }
+                else if(intersect[i].y=intersect[i-1].y)
+                {
+                    while((now.x-10)>intersect[i-1].x)
+                    {
+                        now.x-=10;
+                        scene(&now);
+                    }
+                    now.x=intersect[i-1].x;
+                    scene(&now);
+                }
+            }
+        }
     }
-    bool settings(position *now_p)
+    bool settings(position *now_p)//¯Êsettings¹Ï¤ù¤Á´«
     {
         int op=-1;
         bool _space=1;
@@ -187,6 +252,7 @@ class world
                     case SDLK_UP:
                         if(op!=2)
                             op+=1;
+                        scene(now_p);
                         break;
                     case SDLK_SPACE:
                         if(op==-1)
