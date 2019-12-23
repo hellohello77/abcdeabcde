@@ -6,13 +6,13 @@ using namespace std;
 SDL_Window* window=NULL;//未來要刪掉
 SDL_Event  e;//未來要刪掉
 bool quit=0;//未來要刪掉
-SDL_Renderer* world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);//未來要刪掉
+SDL_Renderer* world_renderer=NULL;//未來要刪掉
 SDL_Surface* storyplot[6]={};//begin
 SDL_Texture* beginstory_texture=NULL;//begin
 SDL_Surface* hungyun=NULL;//world
 SDL_Surface* spotcircle=NULL;//world
 SDL_Surface* settingssurface=NULL;//world
-SDL_Rect world_rect,world_hung_rect,settings_rect;//world
+SDL_Rect world_hung_rect,settings_rect;//world
 SDL_Texture* background_texture=NULL;//world
 SDL_Texture* hung_texture=NULL;//world
 SDL_Texture* spotcircle_texture=NULL;//world
@@ -44,10 +44,10 @@ class world
         SDL_SetRenderDrawColor(world_renderer,0x00,0x00,0x00,0xFF);
         SDL_RenderClear(world_renderer);
         background_texture=SDL_CreateTextureFromSurface(world_renderer,world_background);//背景
-        SDL_RenderCopy(world_renderer,background_texture,NULL,&world_rect);//背景
+        SDL_RenderCopy(world_renderer,background_texture,NULL,NULL);//背景
         drawroute();//line
         drawspot();//spot
-        world_hung_rect.x=now->x;world_hung_rect.y=now->y;//宏
+        world_hung_rect.x=(now->x)-30;world_hung_rect.y=(now->y)-40;//宏
         hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);//宏
         SDL_RenderCopy(world_renderer,hung_texture,NULL,&world_hung_rect);//宏
         if(sett)
@@ -288,24 +288,24 @@ class world
                     sett=1;
                     if(enterworld==0)
                     {
-                        if(op==-2)settingssurface=IMG_Load("images/set0--2");
-                        if(op==-1)settingssurface=IMG_Load("images/set0--1");
-                        if(op==0)settingssurface=IMG_Load("images/set0-0");
+                        if(op==-2)settingssurface=IMG_Load("images/set0--2.png");
+                        if(op==-1)settingssurface=IMG_Load("images/set0--1.png");
+                        if(op==0)settingssurface=IMG_Load("images/set0-0.png");
                     }
                     else if(enterworld==1)
                     {
-                        if(op==-2)settingssurface=IMG_Load("images/set1--2");
-                        if(op==-1)settingssurface=IMG_Load("images/set1--1");
-                        if(op==0)settingssurface=IMG_Load("images/set1-0");
-                        if(op==0)settingssurface=IMG_Load("images/set1-1");
+                        if(op==-2)settingssurface=IMG_Load("images/set1--2.png");
+                        if(op==-1)settingssurface=IMG_Load("images/set1--1.png");
+                        if(op==0)settingssurface=IMG_Load("images/set1-0.png");
+                        if(op==0)settingssurface=IMG_Load("images/set1-1.png");
                     }
                     else if(enterworld==2)
                     {
-                        if(op==-2)settingssurface=IMG_Load("images/set2--2");
-                        if(op==-1)settingssurface=IMG_Load("images/set2--1");
-                        if(op==0)settingssurface=IMG_Load("images/set2-0");
-                        if(op==0)settingssurface=IMG_Load("images/set2-1");
-                        if(op==0)settingssurface=IMG_Load("images/set2-2");
+                        if(op==-2)settingssurface=IMG_Load("images/set2--2.png");
+                        if(op==-1)settingssurface=IMG_Load("images/set2--1.png");
+                        if(op==0)settingssurface=IMG_Load("images/set2-0.png");
+                        if(op==0)settingssurface=IMG_Load("images/set2-1.png");
+                        if(op==0)settingssurface=IMG_Load("images/set2-2.png");
                     }
                     scene(now_p);
                     sett=0;
@@ -326,6 +326,8 @@ world _world[3];//world
 int main(int argc, char* argv[])
 {
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
+    world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    if(world_renderer==NULL)cout<<5678;
     initworld();
     initbegin();
     initend();
@@ -333,6 +335,8 @@ int main(int argc, char* argv[])
     position now=_world[0].spot[start];
     while(!quit)
     {
+        cout<<1;
+        _world[0].scene(&_world[0].spot[start]);
         _world[now._escape].scene(&now);
         _world[now._escape]._move(now);
         if(now.level!=-1)
@@ -366,60 +370,45 @@ int main(int argc, char* argv[])
 }
 void initworld()
 {
-    _world[0].world_background=IMG_Load("images/world1");
-    _world[1].world_background=IMG_Load("images/world2");
-    _world[2].world_background=IMG_Load("images/world3");
+    _world[0].world_background=IMG_Load("images/world1.png");
+    _world[1].world_background=IMG_Load("images/world2.png");
+    _world[2].world_background=IMG_Load("images/world3.png");
     _world[0]._help=1;_world[0]._ending=1;
     _world[1]._help=0;_world[1]._ending=1;
     _world[2]._help=0;_world[2]._ending=0;
-    _world[0].spot[0].x=100;
-    _world[0].spot[0].y=750;
-    _world[0].spot[0].level=0;
-    _world[0].spot[0]._end=0;
-    _world[0].spot[0]._start=0;
-    _world[0].spot[0]._escape=0;
-    _world[0].spot[0].esc=0;
-    _world[0].spot[0].enter=1;
-    _world[0].spot[1].x=300;
-    _world[0].spot[1].y=700;
-    _world[0].spot[1].level=-1;
-    _world[0].spot[1]._end=0;
-    _world[0].spot[1]._start=1;
-    _world[0].spot[1]._escape=0;
-    _world[0].spot[1].esc=0;
-    _world[0].spot[1].enter=1;//
-    _world[0].spot[0].x=300;
-    _world[0].spot[0].y=600;
-    _world[0].spot[0].level=1;
-    _world[0].spot[0]._end=0;
-    _world[0].spot[0]._start=0;
-    _world[0].spot[0]._escape=0;
-    _world[0].spot[0].esc=0;
-    _world[0].spot[0].enter=1;//
-    _world[0].spot[0].x=500;
-    _world[0].spot[0].y=500;
-    _world[0].spot[0].level=2;
-    _world[0].spot[0]._end=0;
-    _world[0].spot[0]._start=0;
-    _world[0].spot[0]._escape=0;
-    _world[0].spot[0].esc=0;
-    _world[0].spot[0].enter=0;//
-    _world[0].spot[0].x=700;
-    _world[0].spot[0].y=300;
-    _world[0].spot[0].level=3;
-    _world[0].spot[0]._end=0;
-    _world[0].spot[0]._start=0;
-    _world[0].spot[0]._escape=0;
-    _world[0].spot[0].esc=0;
-    _world[0].spot[0].enter=0;//
-    _world[0].spot[0].x=900;
-    _world[0].spot[0].y=200;
-    _world[0].spot[0].level=-1;
-    _world[0].spot[0]._end=1;
-    _world[0].spot[0]._start=0;
-    _world[0].spot[0]._escape=0;
-    _world[0].spot[0].esc=0;
-    _world[0].spot[0].enter=0;//
+    hungyun=IMG_Load("images/hungyun.png");
+    spotcircle=IMG_Load("images/spotcircle.png");
+    for(int i=0;i<3;i++)
+    {
+        if(_world[i]._help==1)
+        {
+            _world[i].spot[0].x=100;
+            _world[i].spot[0].y=750;
+        }
+        else
+        {
+            _world[i].spot[0].x=0;
+            _world[i].spot[0].y=0;
+        }
+        _world[i].spot[1].x=300;
+        _world[i].spot[1].y=700;
+        _world[i].spot[2].x=300;
+        _world[i].spot[2].y=600;
+        _world[i].spot[3].x=500;
+        _world[i].spot[3].y=500;
+        _world[i].spot[4].x=700;
+        _world[i].spot[4].y=300;
+        if(_world[i]._ending==1)
+        {
+            _world[i].spot[5].x=600;
+            _world[i].spot[5].y=200;
+        }
+        else
+        {
+            _world[i].spot[5].x=0;
+            _world[i].spot[5].y=0;
+        }
+    }
     int t=0;
     for(int j=0;j<3;j++)
     {
@@ -432,13 +421,153 @@ void initworld()
             }
             else
                 _world[j].spot[i].level=-1;
-            if(i==6)
+            if(i==ending && _world[j]._ending)
             _world[j].spot[i]._end=1;
             else
                 _world[j].spot[i]._end=0;
+            if(i==start)
+            _world[j].spot[i]._start=1;
+            else
+                _world[j].spot[i]._start=0;
             _world[j].spot[i]._escape=j;
+            _world[j].spot[i].esc=0;
+            if(i<two)
+            _world[j].spot[i].enter=1;
+            else
+                _world[j].spot[i].enter=0;
         }
+        _world[j].character=_world[j].spot[start];
     }
+    for(int i=0;i<15;i++)
+    {
+        _world[0].intersect[i].level=-1;
+        _world[0].intersect[i]._end=0;
+        _world[0].intersect[i]._start=0;
+        _world[0].intersect[i]._escape=0;
+        _world[0].intersect[i].esc=0;
+        if(i<5)
+            _world[0].intersect[i].enter=1;
+        else
+            _world[0].intersect[i].enter=0;
+    }
+    _world[0].intersect[0].x=100;
+    _world[0].intersect[0].y=750;
+    _world[0].intersect[1].x=100;
+    _world[0].intersect[1].y=725;
+    _world[0].intersect[2].x=300;
+    _world[0].intersect[2].y=725;
+    _world[0].intersect[3].x=300;
+    _world[0].intersect[3].y=700;
+    _world[0].intersect[4].x=300;
+    _world[0].intersect[4].y=600;
+    _world[0].intersect[5].x=300;
+    _world[0].intersect[5].y=550;
+    _world[0].intersect[6].x=500;
+    _world[0].intersect[6].y=550;
+    _world[0].intersect[7].x=500;
+    _world[0].intersect[7].y=500;
+    _world[0].intersect[8].x=500;
+    _world[0].intersect[8].y=400;
+    _world[0].intersect[9].x=700;
+    _world[0].intersect[9].y=400;
+    _world[0].intersect[10].x=700;
+    _world[0].intersect[10].y=300;
+    _world[0].intersect[11].x=700;
+    _world[0].intersect[11].y=250;
+    _world[0].intersect[12].x=600;
+    _world[0].intersect[12].y=250;
+    _world[0].intersect[13].x=600;
+    _world[0].intersect[13].y=200;
+    _world[0].intersect[14].x=0;
+    _world[0].intersect[14].y=0;
+    for(int i=0;i<15;i++)
+    {
+        _world[1].intersect[i].level=-1;
+        _world[1].intersect[i]._end=0;
+        _world[1].intersect[i]._start=0;
+        _world[1].intersect[i]._escape=1;
+        _world[1].intersect[i].esc=0;
+        if(i<2)
+            _world[0].intersect[i].enter=1;
+        else
+            _world[0].intersect[i].enter=0;
+    }
+    _world[1].intersect[0].x=300;
+    _world[1].intersect[0].y=700;
+    _world[1].intersect[1].x=300;
+    _world[1].intersect[1].y=600;
+    _world[1].intersect[2].x=300;
+    _world[1].intersect[2].y=550;
+    _world[1].intersect[3].x=500;
+    _world[1].intersect[3].y=550;
+    _world[1].intersect[4].x=500;
+    _world[1].intersect[4].y=500;
+    _world[1].intersect[5].x=500;
+    _world[1].intersect[5].y=400;
+    _world[1].intersect[6].x=700;
+    _world[1].intersect[6].y=400;
+    _world[1].intersect[7].x=700;
+    _world[1].intersect[7].y=300;
+    _world[1].intersect[8].x=700;
+    _world[1].intersect[8].y=250;
+    _world[1].intersect[9].x=600;
+    _world[1].intersect[9].y=250;
+    _world[1].intersect[10].x=600;
+    _world[1].intersect[10].y=200;
+    _world[1].intersect[11].x=0;
+    _world[1].intersect[11].y=0;
+    _world[1].intersect[12].x=0;
+    _world[1].intersect[12].y=0;
+    _world[1].intersect[13].x=0;
+    _world[1].intersect[13].y=0;
+    _world[1].intersect[14].x=0;
+    _world[1].intersect[14].y=0;
+    for(int i=0;i<15;i++)
+    {
+        _world[1].intersect[i].level=-1;
+        _world[1].intersect[i]._end=0;
+        _world[1].intersect[i]._start=0;
+        _world[1].intersect[i]._escape=1;
+        _world[1].intersect[i].esc=0;
+        if(i<2)
+            _world[0].intersect[i].enter=1;
+        else
+            _world[0].intersect[i].enter=0;
+    }
+    _world[2].intersect[0].x=300;
+    _world[2].intersect[0].y=700;
+    _world[2].intersect[1].x=300;
+    _world[2].intersect[1].y=600;
+    _world[2].intersect[2].x=300;
+    _world[2].intersect[2].y=550;
+    _world[2].intersect[3].x=500;
+    _world[2].intersect[3].y=550;
+    _world[2].intersect[4].x=500;
+    _world[2].intersect[4].y=500;
+    _world[2].intersect[5].x=500;
+    _world[2].intersect[5].y=400;
+    _world[2].intersect[6].x=700;
+    _world[2].intersect[6].y=400;
+    _world[2].intersect[7].x=700;
+    _world[2].intersect[7].y=300;
+    _world[2].intersect[8].x=0;
+    _world[2].intersect[8].y=0;
+    _world[2].intersect[9].x=0;
+    _world[2].intersect[9].y=0;
+    _world[2].intersect[10].x=0;
+    _world[2].intersect[10].y=0;
+    _world[2].intersect[11].x=0;
+    _world[2].intersect[11].y=0;
+    _world[2].intersect[12].x=0;
+    _world[2].intersect[12].y=0;
+    _world[2].intersect[13].x=0;
+    _world[2].intersect[13].y=0;
+    _world[2].intersect[14].x=0;
+    _world[2].intersect[14].y=0;
+    world_hung_rect.x=0;world_hung_rect.y=0;
+    world_hung_rect.h=80;world_hung_rect.w=60;
+    settings_rect.x=1100;settings_rect.y=650;
+    settings_rect.h=100;settings_rect.w=50;
 }
 void adjustenter(position now)
 {
@@ -469,21 +598,21 @@ void adjustenter(position now)
 }
 void initbegin()
 {
-    storyplot[0]=IMG_Load("images/begin0");
-    storyplot[1]=IMG_Load("images/begin1");
-    storyplot[2]=IMG_Load("images/begin2");
-    storyplot[3]=IMG_Load("images/begin3");
-    storyplot[4]=IMG_Load("images/begin4");
-    storyplot[5]=IMG_Load("images/begin5");
+    storyplot[0]=IMG_Load("images/begin0.png");
+    storyplot[1]=IMG_Load("images/begin1.png");
+    storyplot[2]=IMG_Load("images/begin2.png");
+    storyplot[3]=IMG_Load("images/begin3.png");
+    storyplot[4]=IMG_Load("images/begin4.png");
+    storyplot[5]=IMG_Load("images/begin5.png");
 }
 void initend()
 {
-    _storyplot[0]=IMG_Load("images/end0");
-    _storyplot[1]=IMG_Load("images/end1");
-    _storyplot[2]=IMG_Load("images/end2");
-    _storyplot[3]=IMG_Load("images/end3");
-    _storyplot[4]=IMG_Load("images/end4");
-    _storyplot[5]=IMG_Load("images/end5");
+    _storyplot[0]=IMG_Load("images/end0.png");
+    _storyplot[1]=IMG_Load("images/end1.png");
+    _storyplot[2]=IMG_Load("images/end2.png");
+    _storyplot[3]=IMG_Load("images/end3.png");
+    _storyplot[4]=IMG_Load("images/end4.png");
+    _storyplot[5]=IMG_Load("images/end5.png");
 }
 void begin_story()
 {
@@ -491,10 +620,15 @@ void begin_story()
     for(int i=0;i<6;i++)
     {
         beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[i]);//背景
-        SDL_RenderCopy(world_renderer,beginstory_texture,NULL,&world_rect);
+        SDL_RenderCopy(world_renderer,beginstory_texture,NULL,NULL);
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(beginstory_texture);
         beginstory_texture=NULL;
+        int b=1;
+        while(b)
+        {
+
+
         while( SDL_PollEvent( &e ) != 0 )
         {
             if( e.type == SDL_QUIT )
@@ -505,6 +639,7 @@ void begin_story()
             {
                 if(e.key.keysym.sym==SDLK_SPACE)
                 {
+                    b=0;
                     break;
                 }
                 else if(e.key.keysym.sym==SDLK_ESCAPE)
@@ -513,9 +648,9 @@ void begin_story()
                     break;
                 }
             }
-        }
+        }}
         if(a)
-            break;
+            return;
     }
 }
 void end_story()
@@ -524,7 +659,7 @@ void end_story()
     for(int i=0;i<6;i++)
     {
         beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,_storyplot[i]);//背景
-        SDL_RenderCopy(world_renderer,endstory_texture,NULL,&world_rect);
+        SDL_RenderCopy(world_renderer,endstory_texture,NULL,NULL);
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(endstory_texture);
         endstory_texture=NULL;
