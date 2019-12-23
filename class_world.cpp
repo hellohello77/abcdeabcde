@@ -95,7 +95,7 @@ class world
                                 }
                                 break;
                             case SDLK_UP:
-                                if(i<three || (i==three && _ending==1))
+                                if((i<three || (i==three && _ending==1)) && spot[i+1].enter)
                                 {
                                     animation(spot[i],spot[i+1],now);
                                     now=spot[i+1];
@@ -130,7 +130,7 @@ class world
                     if(intersect[i].y<intersect[i+1].y)
                     {
                         SDL_Rect fillroute = { intersect[i].x-10, intersect[i].y-10, 20, intersect[i+1].y-intersect[i].y+20 };
-                        if(intersect[i+1].enter)
+                        if(intersect[i+1].enter==1)
                             SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
                             SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
@@ -139,7 +139,7 @@ class world
                     else
                     {
                         SDL_Rect fillroute = { intersect[i+1].x-10, intersect[i+1].y-10, 20, intersect[i].y-intersect[i+1].y+20 };
-                        if(intersect[i+1].enter)
+                        if(intersect[i+1].enter==1)
                             SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
                             SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
@@ -160,7 +160,7 @@ class world
                     else
                     {
                         SDL_Rect fillroute = { intersect[i+1].x-10, intersect[i+1].y-10, intersect[i].x-intersect[i+1].x+20 , 20};
-                        if(intersect[i+1].enter)
+                        if(intersect[i+1].enter==1)
                             SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
                             SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
@@ -200,9 +200,9 @@ class world
             {
                 if(intersect[i].x==intersect[i+1].x)
                 {
-                    while((now.y+10)<intersect[i+1].y)
+                    while((now.y-10)>intersect[i+1].y)
                     {
-                        now.y+=10;
+                        now.y-=10;
                         scene(&now);
                     }
                     now.y=intersect[i+1].y;
@@ -226,9 +226,9 @@ class world
             {
                 if(intersect[i].x==intersect[i-1].x)
                 {
-                    while((now.y-10)>intersect[i-1].y)
+                    while((now.y+10)<intersect[i-1].y)
                     {
-                        now.y-=10;
+                        now.y+=10;
                         scene(&now);
                     }
                     now.y=intersect[i-1].y;
@@ -246,6 +246,7 @@ class world
                 }
             }
         }
+        return;
     }
     bool settings(position *now_p)
     {
@@ -327,7 +328,6 @@ int main(int argc, char* argv[])
 {
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
     world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
-    if(world_renderer==NULL)cout<<5678;
     initworld();
     initbegin();
     initend();
@@ -335,7 +335,6 @@ int main(int argc, char* argv[])
     position now=_world[0].spot[start];
     while(!quit)
     {
-        cout<<1;
         _world[0].scene(&_world[0].spot[start]);
         _world[now._escape].scene(&now);
         _world[now._escape]._move(now);
@@ -488,9 +487,9 @@ void initworld()
         _world[1].intersect[i]._escape=1;
         _world[1].intersect[i].esc=0;
         if(i<2)
-            _world[0].intersect[i].enter=1;
+            _world[1].intersect[i].enter=1;
         else
-            _world[0].intersect[i].enter=0;
+            _world[1].intersect[i].enter=0;
     }
     _world[1].intersect[0].x=300;
     _world[1].intersect[0].y=700;
@@ -530,9 +529,9 @@ void initworld()
         _world[1].intersect[i]._escape=1;
         _world[1].intersect[i].esc=0;
         if(i<2)
-            _world[0].intersect[i].enter=1;
+            _world[1].intersect[i].enter=1;
         else
-            _world[0].intersect[i].enter=0;
+            _world[1].intersect[i].enter=0;
     }
     _world[2].intersect[0].x=300;
     _world[2].intersect[0].y=700;
