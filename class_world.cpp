@@ -5,7 +5,7 @@
 using namespace std;
 SDL_Window* window=NULL;//未來要刪掉
 SDL_Event  e;//未來要刪掉
-bool quit;//未來要刪掉
+bool quit=0;//未來要刪掉
 SDL_Renderer* world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);//未來要刪掉
 SDL_Surface* storyplot[6]={};//begin
 SDL_Texture* beginstory_texture=NULL;//begin
@@ -41,6 +41,7 @@ class world
     bool _help,_ending;
     void scene(position* now)//已修改
     {
+        SDL_SetRenderDrawColor(world_renderer,0x00,0x00,0x00,0xFF);
         SDL_RenderClear(world_renderer);
         background_texture=SDL_CreateTextureFromSurface(world_renderer,world_background);//背景
         SDL_RenderCopy(world_renderer,background_texture,NULL,&world_rect);//背景
@@ -130,18 +131,18 @@ class world
                     {
                         SDL_Rect fillroute = { intersect[i].x-10, intersect[i].y-10, 20, intersect[i+1].y-intersect[i].y+20 };
                         if(intersect[i+1].enter)
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
                         SDL_RenderFillRect( world_renderer, &fillroute );
                     }
                     else
                     {
                         SDL_Rect fillroute = { intersect[i+1].x-10, intersect[i+1].y-10, 20, intersect[i].y-intersect[i+1].y+20 };
                         if(intersect[i+1].enter)
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
                         SDL_RenderFillRect( world_renderer, &fillroute );
                     }
                 }
@@ -151,18 +152,18 @@ class world
                     {
                         SDL_Rect fillroute = { intersect[i].x-10, intersect[i].y-10, intersect[i+1].x-intersect[i].x+20, 20 };
                         if(intersect[i+1].enter)
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
                         SDL_RenderFillRect( world_renderer, &fillroute );
                     }
                     else
                     {
                         SDL_Rect fillroute = { intersect[i+1].x-10, intersect[i+1].y-10, intersect[i].x-intersect[i+1].x+20 , 20};
                         if(intersect[i+1].enter)
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0xEE, 0xD0, 0x00, 0xFF );
                         else
-                            SDL_SetRenderDrawColor( world_renderer, 0xFF, 0x00, 0x00, 0xFF );
+                            SDL_SetRenderDrawColor( world_renderer, 0x66, 0x55, 0x00, 0xFF );
                         SDL_RenderFillRect( world_renderer, &fillroute );
                     }
                 }
@@ -319,12 +320,13 @@ void initbegin();
 void initend();
 void begin_story();
 void end_story();
+void initworld();
 world _world[3];//world
 
 int main(int argc, char* argv[])
 {
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
-    //初始化world
+    initworld();
     initbegin();
     initend();
     begin_story();
@@ -361,6 +363,82 @@ int main(int argc, char* argv[])
     }
     end_story();
     return 0;
+}
+void initworld()
+{
+    _world[0].world_background=IMG_Load("images/world1");
+    _world[1].world_background=IMG_Load("images/world2");
+    _world[2].world_background=IMG_Load("images/world3");
+    _world[0]._help=1;_world[0]._ending=1;
+    _world[1]._help=0;_world[1]._ending=1;
+    _world[2]._help=0;_world[2]._ending=0;
+    _world[0].spot[0].x=100;
+    _world[0].spot[0].y=750;
+    _world[0].spot[0].level=0;
+    _world[0].spot[0]._end=0;
+    _world[0].spot[0]._start=0;
+    _world[0].spot[0]._escape=0;
+    _world[0].spot[0].esc=0;
+    _world[0].spot[0].enter=1;
+    _world[0].spot[1].x=300;
+    _world[0].spot[1].y=700;
+    _world[0].spot[1].level=-1;
+    _world[0].spot[1]._end=0;
+    _world[0].spot[1]._start=1;
+    _world[0].spot[1]._escape=0;
+    _world[0].spot[1].esc=0;
+    _world[0].spot[1].enter=1;//
+    _world[0].spot[0].x=300;
+    _world[0].spot[0].y=600;
+    _world[0].spot[0].level=1;
+    _world[0].spot[0]._end=0;
+    _world[0].spot[0]._start=0;
+    _world[0].spot[0]._escape=0;
+    _world[0].spot[0].esc=0;
+    _world[0].spot[0].enter=1;//
+    _world[0].spot[0].x=500;
+    _world[0].spot[0].y=500;
+    _world[0].spot[0].level=2;
+    _world[0].spot[0]._end=0;
+    _world[0].spot[0]._start=0;
+    _world[0].spot[0]._escape=0;
+    _world[0].spot[0].esc=0;
+    _world[0].spot[0].enter=0;//
+    _world[0].spot[0].x=700;
+    _world[0].spot[0].y=300;
+    _world[0].spot[0].level=3;
+    _world[0].spot[0]._end=0;
+    _world[0].spot[0]._start=0;
+    _world[0].spot[0]._escape=0;
+    _world[0].spot[0].esc=0;
+    _world[0].spot[0].enter=0;//
+    _world[0].spot[0].x=900;
+    _world[0].spot[0].y=200;
+    _world[0].spot[0].level=-1;
+    _world[0].spot[0]._end=1;
+    _world[0].spot[0]._start=0;
+    _world[0].spot[0]._escape=0;
+    _world[0].spot[0].esc=0;
+    _world[0].spot[0].enter=0;//
+    int t=0;
+    for(int j=0;j<3;j++)
+    {
+        for(int i=0;i<6;i++)
+        {
+            if(i==one || (i==help && _world[j]._help) || i==two || i==three)
+            {
+                _world[j].spot[i].level=t;
+                t++;
+            }
+            else
+                _world[j].spot[i].level=-1;
+            if(i==6)
+            _world[j].spot[i]._end=1;
+            else
+                _world[j].spot[i]._end=0;
+            _world[j].spot[i]._escape=j;
+        }
+    }
 }
 void adjustenter(position now)
 {
