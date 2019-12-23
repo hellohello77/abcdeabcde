@@ -73,11 +73,11 @@ class world
         bool space=1,escape=1;
         while(space && escape)
         {
-            for(int i=0;i<6;i++)
+            while( SDL_PollEvent( &e ) != 0 )
             {
-                if(now.x==spot[i].x && now.y==spot[i].y)
+                for(int i=0;i<6;i++)
                 {
-                    while( SDL_PollEvent( &e ) != 0 )
+                    if(now.x==spot[i].x && now.y==spot[i].y)
                     {
                         if( e.type == SDL_QUIT )
                         {
@@ -107,12 +107,12 @@ class world
                             case SDLK_ESCAPE:
                                 if(settings(&now))
                                 {
-                                    escape=0;
                                     now.esc=1;
+                                    return;
                                 }
                                 break;
                             }
-                        }
+                        }break;
                     }
                 }
             }
@@ -251,6 +251,21 @@ class world
     bool settings(position *now_p)
     {
         int op=-1;
+        sett=1;
+        if(enterworld==0)
+        {
+            settingssurface=IMG_Load("images/set0--1.png");
+        }
+        else if(enterworld==1)
+        {
+            settingssurface=IMG_Load("images/set1--1.png");
+        }
+        else if(enterworld==2)
+        {
+            settingssurface=IMG_Load("images/set2--1.png");
+        }
+        scene(now_p);
+        sett=0;
         bool _space=1;
         while(_space)
         {
@@ -277,7 +292,10 @@ class world
                         break;
                     case SDLK_SPACE:
                         if(op==-1)
+                        {
+                            scene(now_p);
                             return 0;
+                        }
                         else
                         {
                             now_p->_escape=op;
@@ -298,15 +316,15 @@ class world
                         if(op==-2)settingssurface=IMG_Load("images/set1--2.png");
                         if(op==-1)settingssurface=IMG_Load("images/set1--1.png");
                         if(op==0)settingssurface=IMG_Load("images/set1-0.png");
-                        if(op==0)settingssurface=IMG_Load("images/set1-1.png");
+                        if(op==1)settingssurface=IMG_Load("images/set1-1.png");
                     }
                     else if(enterworld==2)
                     {
                         if(op==-2)settingssurface=IMG_Load("images/set2--2.png");
                         if(op==-1)settingssurface=IMG_Load("images/set2--1.png");
                         if(op==0)settingssurface=IMG_Load("images/set2-0.png");
-                        if(op==0)settingssurface=IMG_Load("images/set2-1.png");
-                        if(op==0)settingssurface=IMG_Load("images/set2-2.png");
+                        if(op==1)settingssurface=IMG_Load("images/set2-1.png");
+                        if(op==2)settingssurface=IMG_Load("images/set2-2.png");
                     }
                     scene(now_p);
                     sett=0;
@@ -333,14 +351,27 @@ int main(int argc, char* argv[])
     initend();
     begin_story();
     position now=_world[0].spot[start];
-    while(!quit)
+    while(1)
     {
-        _world[0].scene(&_world[0].spot[start]);
         _world[now._escape].scene(&now);
         _world[now._escape]._move(now);
-        if(now.level!=-1)
+        if(now.esc==1)
         {
-            //呼叫關卡(如果贏了呼叫adjustenter(now))
+            if(now._escape==-2)
+            {
+                cout<<"welcomesurface"<<endl;//切到welcomesurface
+            }
+            else if(now._escape==0 || now._escape==1 ||now._escape==2)
+            {
+                now=_world[now._escape].spot[start];
+            }
+        }
+        else if(now.level>-1)
+        {
+            cout<<now.level<<endl;
+            int i=1;
+            if(i==1)
+                adjustenter(now);//呼叫關卡(如果贏了呼叫adjustenter(now))
         }
         else if(now._start==1 && now._escape!=0)
         {
@@ -351,17 +382,6 @@ int main(int argc, char* argv[])
         {
             now._escape++;
             now=_world[now._escape].spot[start];
-        }
-        else if(now.esc==1)
-        {
-            if(now._escape==-2)
-            {
-                //切到welcomesurface
-            }
-            else if(now._escape==0 || now._escape==1 ||now._escape==2)
-            {
-                now=_world[now._escape].spot[start];
-            }
         }
     }
     end_story();
@@ -523,15 +543,15 @@ void initworld()
     _world[1].intersect[14].y=0;
     for(int i=0;i<15;i++)
     {
-        _world[1].intersect[i].level=-1;
-        _world[1].intersect[i]._end=0;
-        _world[1].intersect[i]._start=0;
-        _world[1].intersect[i]._escape=1;
-        _world[1].intersect[i].esc=0;
+        _world[2].intersect[i].level=-1;
+        _world[2].intersect[i]._end=0;
+        _world[2].intersect[i]._start=0;
+        _world[2].intersect[i]._escape=1;
+        _world[2].intersect[i].esc=0;
         if(i<2)
-            _world[1].intersect[i].enter=1;
+            _world[2].intersect[i].enter=1;
         else
-            _world[1].intersect[i].enter=0;
+            _world[2].intersect[i].enter=0;
     }
     _world[2].intersect[0].x=300;
     _world[2].intersect[0].y=700;
@@ -565,12 +585,12 @@ void initworld()
     _world[2].intersect[14].y=0;
     world_hung_rect.x=0;world_hung_rect.y=0;
     world_hung_rect.h=80;world_hung_rect.w=60;
-    settings_rect.x=1100;settings_rect.y=650;
-    settings_rect.h=100;settings_rect.w=50;
+    settings_rect.x=1000;settings_rect.y=550;
+    settings_rect.h=200;settings_rect.w=150;
 }
 void adjustenter(position now)
 {
-    if(now.level==0)return;
+    if(now.level==0){return;}
     for(int i=0;i<6;i++)
     {
         if(_world[now._escape].spot[i].x==now.x && _world[now._escape].spot[i].y==now.y)
@@ -579,6 +599,7 @@ void adjustenter(position now)
             {
                 if(_world[now._escape].spot[i+1].x==_world[now._escape].intersect[j].x && _world[now._escape].spot[i+1].y==_world[now._escape].intersect[j].y)
                 {
+                    _world[now._escape].spot[i+1].enter=1;
                     while(!_world[now._escape].intersect[j].enter)
                     {
                         _world[now._escape].intersect[j].enter=1;
@@ -592,8 +613,8 @@ void adjustenter(position now)
         {
             enterworld+=1;
         }
-        break;
     }
+    return;
 }
 void initbegin()
 {
@@ -615,7 +636,6 @@ void initend()
 }
 void begin_story()
 {
-    int a=0;
     for(int i=0;i<6;i++)
     {
         beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[i]);//背景
@@ -626,8 +646,6 @@ void begin_story()
         int b=1;
         while(b)
         {
-
-
         while( SDL_PollEvent( &e ) != 0 )
         {
             if( e.type == SDL_QUIT )
@@ -643,18 +661,15 @@ void begin_story()
                 }
                 else if(e.key.keysym.sym==SDLK_ESCAPE)
                 {
-                    a=1;
-                    break;
+                    return;
                 }
             }
-        }}
-        if(a)
-            return;
+        }
+        }
     }
 }
 void end_story()
 {
-    int a=0;
     for(int i=0;i<6;i++)
     {
         beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,_storyplot[i]);//背景
@@ -662,6 +677,9 @@ void end_story()
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(endstory_texture);
         endstory_texture=NULL;
+        int b=1;
+        while(b)
+        {
         while( SDL_PollEvent( &e ) != 0 )
         {
             if( e.type == SDL_QUIT )
@@ -676,12 +694,10 @@ void end_story()
                 }
                 else if(e.key.keysym.sym==SDLK_ESCAPE)
                 {
-                    a=1;
-                    break;
+                    return;
                 }
             }
         }
-        if(a)
-            break;
+        }
     }
 }
