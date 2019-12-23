@@ -6,17 +6,21 @@ using namespace std;
 SDL_Window* window=NULL;//未來要刪掉
 SDL_Event  e;//未來要刪掉
 bool quit;//未來要刪掉
-SDL_Surface* hungyun=NULL;
-SDL_Surface* spotcircle=NULL;
-SDL_Surface* settingssurface=NULL;
-SDL_Renderer* world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
-SDL_Rect world_rect,world_hung_rect,settings_rect;
-SDL_Texture* background_texture=NULL;
-SDL_Texture* hung_texture=NULL;
-SDL_Texture* spotcircle_texture=NULL;
-SDL_Texture* settings_texture=NULL;
-int enterworld=0;
-bool sett=0;
+SDL_Renderer* world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);//未來要刪掉
+SDL_Surface* storyplot[6]={};//begin
+SDL_Texture* beginstory_texture=NULL;//begin
+SDL_Surface* hungyun=NULL;//world
+SDL_Surface* spotcircle=NULL;//world
+SDL_Surface* settingssurface=NULL;//world
+SDL_Rect world_rect,world_hung_rect,settings_rect;//world
+SDL_Texture* background_texture=NULL;//world
+SDL_Texture* hung_texture=NULL;//world
+SDL_Texture* spotcircle_texture=NULL;//world
+SDL_Texture* settings_texture=NULL;//world
+int enterworld=0;//world
+bool sett=0;//world
+SDL_Surface* _storyplot[6]={};//end
+SDL_Texture* endstory_texture=NULL;//end
 struct position
 {
     int x;//座標
@@ -55,6 +59,12 @@ class world
         background_texture=NULL;
         SDL_DestroyTexture(hung_texture);
         hung_texture=NULL;
+        if(sett)
+        {
+            SDL_FreeSurface(settingssurface);
+            SDL_DestroyTexture(settings_texture);
+            settings_texture=NULL;
+        }
         return ;
     }
     void _move(position &now)//已修改
@@ -305,12 +315,19 @@ class world
     }
 };
 void adjustenter(position now);
-world _world[3];
+void initbegin();
+void initend();
+void begin_story();
+void end_story();
+world _world[3];//world
 
 int main(int argc, char* argv[])
 {
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
     //初始化world
+    initbegin();
+    initend();
+    begin_story();
     position now=_world[0].spot[start];
     while(!quit)
     {
@@ -342,6 +359,7 @@ int main(int argc, char* argv[])
             }
         }
     }
+    end_story();
     return 0;
 }
 void adjustenter(position now)
@@ -369,5 +387,89 @@ void adjustenter(position now)
             enterworld+=1;
         }
         break;
+    }
+}
+void initbegin()
+{
+    storyplot[0]=IMG_Load("images/begin0");
+    storyplot[1]=IMG_Load("images/begin1");
+    storyplot[2]=IMG_Load("images/begin2");
+    storyplot[3]=IMG_Load("images/begin3");
+    storyplot[4]=IMG_Load("images/begin4");
+    storyplot[5]=IMG_Load("images/begin5");
+}
+void initend()
+{
+    _storyplot[0]=IMG_Load("images/end0");
+    _storyplot[1]=IMG_Load("images/end1");
+    _storyplot[2]=IMG_Load("images/end2");
+    _storyplot[3]=IMG_Load("images/end3");
+    _storyplot[4]=IMG_Load("images/end4");
+    _storyplot[5]=IMG_Load("images/end5");
+}
+void begin_story()
+{
+    int a=0;
+    for(int i=0;i<6;i++)
+    {
+        beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[i]);//背景
+        SDL_RenderCopy(world_renderer,beginstory_texture,NULL,&world_rect);
+        SDL_RenderPresent(world_renderer);
+        SDL_DestroyTexture(beginstory_texture);
+        beginstory_texture=NULL;
+        while( SDL_PollEvent( &e ) != 0 )
+        {
+            if( e.type == SDL_QUIT )
+            {
+                quit = true;
+            }
+            else if( e.type == SDL_KEYDOWN )
+            {
+                if(e.key.keysym.sym==SDLK_SPACE)
+                {
+                    break;
+                }
+                else if(e.key.keysym.sym==SDLK_ESCAPE)
+                {
+                    a=1;
+                    break;
+                }
+            }
+        }
+        if(a)
+            break;
+    }
+}
+void end_story()
+{
+    int a=0;
+    for(int i=0;i<6;i++)
+    {
+        beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,_storyplot[i]);//背景
+        SDL_RenderCopy(world_renderer,endstory_texture,NULL,&world_rect);
+        SDL_RenderPresent(world_renderer);
+        SDL_DestroyTexture(endstory_texture);
+        endstory_texture=NULL;
+        while( SDL_PollEvent( &e ) != 0 )
+        {
+            if( e.type == SDL_QUIT )
+            {
+                quit = true;
+            }
+            else if( e.type == SDL_KEYDOWN )
+            {
+                if(e.key.keysym.sym==SDLK_SPACE)
+                {
+                    break;
+                }
+                else if(e.key.keysym.sym==SDLK_ESCAPE)
+                {
+                    a=1;
+                    break;
+                }
+            }
+        }
+        if(a)
+            break;
     }
 }
