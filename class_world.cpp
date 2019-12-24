@@ -3,6 +3,7 @@
 #include<stdio.h>
 #include<SDL2/SDL_image.h>
 using namespace std;
+int speed=10;
 SDL_Window* window=NULL;//未來要刪掉
 SDL_Event  e;//未來要刪掉
 bool quit=0;//未來要刪掉
@@ -200,9 +201,9 @@ class world
             {
                 if(intersect[i].x==intersect[i+1].x)
                 {
-                    while((now.y-10)>intersect[i+1].y)
+                    while((now.y-speed)>intersect[i+1].y)
                     {
-                        now.y-=10;
+                        now.y-=speed;
                         scene(&now);
                     }
                     now.y=intersect[i+1].y;
@@ -212,9 +213,9 @@ class world
                 {
                     if(intersect[i].x<intersect[i+1].x)
                     {
-                    while((now.x+10)<intersect[i+1].x)
+                    while((now.x+speed)<intersect[i+1].x)
                     {
-                        now.x+=10;
+                        now.x+=speed;
                         scene(&now);
                     }
                     now.x=intersect[i+1].x;
@@ -222,9 +223,9 @@ class world
                     }
                     else
                     {
-                    while((now.x-10)>intersect[i+1].x)
+                    while((now.x-speed)>intersect[i+1].x)
                     {
-                        now.x-=10;
+                        now.x-=speed;
                         scene(&now);
                     }
                     now.x=intersect[i+1].x;
@@ -239,9 +240,9 @@ class world
             {
                 if(intersect[i].x==intersect[i-1].x)
                 {
-                    while((now.y+10)<intersect[i-1].y)
+                    while((now.y+speed)<intersect[i-1].y)
                     {
-                        now.y+=10;
+                        now.y+=speed;
                         scene(&now);
                     }
                     now.y=intersect[i-1].y;
@@ -251,9 +252,9 @@ class world
                 {
                     if(intersect[i].x>intersect[i-1].x)
                     {
-                    while((now.x-10)>intersect[i-1].x)
+                    while((now.x-speed)>intersect[i-1].x)
                     {
-                        now.x-=10;
+                        now.x-=speed;
                         scene(&now);
                     }
                     now.x=intersect[i-1].x;
@@ -261,9 +262,9 @@ class world
                     }
                     else
                     {
-                    while((now.x+10)<intersect[i-1].x)
+                    while((now.x+speed)<intersect[i-1].x)
                     {
-                        now.x+=10;
+                        now.x+=speed;
                         scene(&now);
                     }
                     now.x=intersect[i-1].x;
@@ -360,6 +361,7 @@ class world
         return 1;
     }
 };
+int get_in_world(position &now);
 void adjustenter(position now);
 void initbegin();
 void initend();
@@ -370,6 +372,7 @@ world _world[3];//world
 
 int main(int argc, char* argv[])
 {
+    int functionchoose=0;
     window=SDL_CreateWindow("world", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,1200, 800, SDL_WINDOW_SHOWN );
     world_renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
     initworld();
@@ -377,6 +380,12 @@ int main(int argc, char* argv[])
     initend();
     begin_story();
     position now=_world[0].spot[start];
+    functionchoose=get_in_world(now);//functionchoose>=0代表關卡，-2代表welcomesurface
+    end_story();
+    return 0;
+}
+int get_in_world(position &now)
+{
     while(1)
     {
         _world[now._escape].scene(&now);
@@ -385,7 +394,7 @@ int main(int argc, char* argv[])
         {
             if(now._escape==-2)
             {
-                cout<<"welcomesurface"<<endl;//切到welcomesurface
+                return now._escape;//切到welcomesurface
             }
             else if(now._escape==0 || now._escape==1 ||now._escape==2)
             {
@@ -410,8 +419,6 @@ int main(int argc, char* argv[])
             now=_world[now._escape].spot[start];
         }
     }
-    end_story();
-    return 0;
 }
 void initworld()
 {
