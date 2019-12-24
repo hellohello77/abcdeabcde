@@ -210,6 +210,8 @@ class world
                 }
                 else if(intersect[i].y==intersect[i+1].y)
                 {
+                    if(intersect[i].x<intersect[i+1].x)
+                    {
                     while((now.x+10)<intersect[i+1].x)
                     {
                         now.x+=10;
@@ -217,6 +219,17 @@ class world
                     }
                     now.x=intersect[i+1].x;
                     scene(&now);
+                    }
+                    else
+                    {
+                    while((now.x-10)>intersect[i+1].x)
+                    {
+                        now.x-=10;
+                        scene(&now);
+                    }
+                    now.x=intersect[i+1].x;
+                    scene(&now);
+                    }
                 }
             }
         }
@@ -236,6 +249,8 @@ class world
                 }
                 else if(intersect[i].y==intersect[i-1].y)
                 {
+                    if(intersect[i].x>intersect[i-1].x)
+                    {
                     while((now.x-10)>intersect[i-1].x)
                     {
                         now.x-=10;
@@ -243,6 +258,17 @@ class world
                     }
                     now.x=intersect[i-1].x;
                     scene(&now);
+                    }
+                    else
+                    {
+                    while((now.x+10)<intersect[i-1].x)
+                    {
+                        now.x+=10;
+                        scene(&now);
+                    }
+                    now.x=intersect[i-1].x;
+                    scene(&now);
+                    }
                 }
             }
         }
