@@ -12,12 +12,17 @@ SDL_Surface* storyplot[5]={};//begin
 SDL_Texture* beginstory_texture=NULL;//begin
 SDL_Surface* hungyun=NULL;//world
 SDL_Surface* spotcircle=NULL;//world
+SDL_Surface* startcircle=NULL;//world
+SDL_Surface* gocircle=NULL;//world
+SDL_Surface* helpcircle=NULL;//world
 SDL_Surface* settingssurface=NULL;//world
-SDL_Rect world_hung_rect,settings_rect,nonsettings_rect;//world
+SDL_Rect world_hung_rect,settings_rect,nonsettings_rect,level_rect[10];//world
 SDL_Texture* background_texture=NULL;//world
 SDL_Texture* hung_texture=NULL;//world
 SDL_Texture* spotcircle_texture=NULL;//world
 SDL_Texture* settings_texture=NULL;//world
+SDL_Texture* level_texture=NULL;//world
+SDL_Surface* level_surface[10]={};//world
 int enterworld=0;//world
 bool sett=0;//world
 SDL_Surface* _storyplot[5]={};//end
@@ -51,6 +56,21 @@ class world
         world_hung_rect.x=(now->x)-30;world_hung_rect.y=(now->y)-40;//§»
         hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);//§»
         SDL_RenderCopy(world_renderer,hung_texture,NULL,&world_hung_rect);//§»
+        if(now->level>-1)
+        {
+            if(now->level!=0)
+            {
+                level_rect[now->level].y=now->y-90;
+                level_rect[now->level].x=now->x+20;
+            }
+            else
+            {
+                level_rect[now->level].y=now->y-110;
+                level_rect[now->level].x=now->x-280;
+            }
+            level_texture=SDL_CreateTextureFromSurface(world_renderer,level_surface[now->level]);
+            SDL_RenderCopy(world_renderer,level_texture,NULL,&level_rect[now->level]);
+        }
         if(sett)
         {
             settings_texture=SDL_CreateTextureFromSurface(world_renderer,settingssurface);
@@ -65,6 +85,8 @@ class world
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(background_texture);
         background_texture=NULL;
+        SDL_DestroyTexture(level_texture);
+        level_texture=NULL;
         SDL_DestroyTexture(hung_texture);
         hung_texture=NULL;
         SDL_FreeSurface(settingssurface);
@@ -97,6 +119,7 @@ class world
                                 {
                                     animation(spot[i],spot[i-1],now);
                                     now=spot[i-1];
+                                    scene(&now);
                                 }
                                 break;
                             case SDLK_UP:
@@ -104,6 +127,7 @@ class world
                                 {
                                     animation(spot[i],spot[i+1],now);
                                     now=spot[i+1];
+                                    scene(&now);
                                 }
                                 break;
                             case SDLK_SPACE:
@@ -181,8 +205,26 @@ class world
         {
             if(spot[i].x!=0)
             {
-                SDL_Rect spot_rect={spot[i].x-20,spot[i].y-20,40,40};
-                spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,spotcircle);
+                SDL_Rect spot_rect;
+                switch(i)
+                {
+                case(start):
+                    spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,startcircle);
+                    spot_rect={spot[i].x-25,spot[i].y-25,50,50};
+                    break;
+                case(ending):
+                    spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,gocircle);
+                    spot_rect={spot[i].x-25,spot[i].y-25,50,50};
+                    break;
+                case(help):
+                    spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,helpcircle);
+                    spot_rect={spot[i].x-25,spot[i].y-25,50,50};
+                    break;
+                default:
+                    spotcircle_texture=SDL_CreateTextureFromSurface(world_renderer,spotcircle);
+                    spot_rect={spot[i].x-20,spot[i].y-20,40,40};
+                    break;
+                }
                 SDL_RenderCopy(world_renderer,spotcircle_texture,NULL,&spot_rect);
                 SDL_DestroyTexture(spotcircle_texture);
                 spotcircle_texture=NULL;
@@ -191,6 +233,7 @@ class world
     }
     void animation(position START,position END,position &now)
     {
+        now.level=-1;
         int S=-1,E=-1;
         for(int i=0;i<15;i++)
         {
@@ -398,7 +441,6 @@ int main(int argc, char* argv[])
         }
         else if(now.level>-1)
         {
-            cout<<now.level<<endl;
             int i=1;
             if(i==1)
                 adjustenter(now);//©I¥sÃö¥d(¦pªGÄ¹¤F©I¥sadjustenter(now))
@@ -420,6 +462,21 @@ int main(int argc, char* argv[])
 }
 void initworld()
 {
+    level_surface[0]=IMG_Load("images/1-0.png");
+    level_surface[1]=IMG_Load("images/1-1.png");
+    level_surface[2]=IMG_Load("images/1-2.png");
+    level_surface[3]=IMG_Load("images/1-3.png");
+    level_surface[4]=IMG_Load("images/2-1.png");
+    level_surface[5]=IMG_Load("images/2-2.png");
+    level_surface[6]=IMG_Load("images/2-3.png");
+    level_surface[7]=IMG_Load("images/3-1.png");
+    level_surface[8]=IMG_Load("images/3-2.png");
+    level_surface[9]=IMG_Load("images/3-3.png");
+    for(int i=0;i<10;i++)
+    {
+        level_rect[i].w=250;
+        level_rect[i].h=190;
+    }
     _world[0].world_background=IMG_Load("images/world1.png");
     _world[1].world_background=IMG_Load("images/world2.png");
     _world[2].world_background=IMG_Load("images/world3.png");
@@ -428,6 +485,9 @@ void initworld()
     _world[2]._help=0;_world[2]._ending=0;
     hungyun=IMG_Load("images/hungyun.png");
     spotcircle=IMG_Load("images/spotcircle.png");
+    startcircle=IMG_Load("images/START.png");
+    helpcircle=IMG_Load("images/HELP.png");
+    gocircle=IMG_Load("images/GO.png");
     for(int i=1;i<3;i++)
     {
         _world[i].spot[0].x=0;
@@ -487,30 +547,30 @@ void initworld()
         else
             _world[0].intersect[i].enter=0;
     }
-    _world[0].intersect[0].x=740;//
-    _world[0].intersect[0].y=569;//
-    _world[0].intersect[1].x=740;//
-    _world[0].intersect[1].y=522;//
-    _world[0].intersect[2].x=553;//
-    _world[0].intersect[2].y=522;//
-    _world[0].intersect[3].x=553;//
-    _world[0].intersect[3].y=476;//
-    _world[0].intersect[4].x=553;//
-    _world[0].intersect[4].y=383;//
-    _world[0].intersect[5].x=553;//
-    _world[0].intersect[5].y=337;//
-    _world[0].intersect[6].x=348;//
-    _world[0].intersect[6].y=337;//
-    _world[0].intersect[7].x=348;//
-    _world[0].intersect[7].y=272;//
-    _world[0].intersect[8].x=348;//
-    _world[0].intersect[8].y=203;//
-    _world[0].intersect[9].x=348;//
-    _world[0].intersect[9].y=144;//
-    _world[0].intersect[10].x=208;//
-    _world[0].intersect[10].y=144;//
-    _world[0].intersect[11].x=208;//
-    _world[0].intersect[11].y=89;//
+    _world[0].intersect[0].x=740;
+    _world[0].intersect[0].y=569;
+    _world[0].intersect[1].x=740;
+    _world[0].intersect[1].y=522;
+    _world[0].intersect[2].x=553;
+    _world[0].intersect[2].y=522;
+    _world[0].intersect[3].x=553;
+    _world[0].intersect[3].y=476;
+    _world[0].intersect[4].x=553;
+    _world[0].intersect[4].y=383;
+    _world[0].intersect[5].x=553;
+    _world[0].intersect[5].y=337;
+    _world[0].intersect[6].x=348;
+    _world[0].intersect[6].y=337;
+    _world[0].intersect[7].x=348;
+    _world[0].intersect[7].y=272;
+    _world[0].intersect[8].x=348;
+    _world[0].intersect[8].y=203;
+    _world[0].intersect[9].x=348;
+    _world[0].intersect[9].y=144;
+    _world[0].intersect[10].x=208;
+    _world[0].intersect[10].y=144;
+    _world[0].intersect[11].x=208;
+    _world[0].intersect[11].y=89;
     _world[0].intersect[12].x=0;
     _world[0].intersect[12].y=0;
     _world[0].intersect[13].x=0;
@@ -539,28 +599,28 @@ void initworld()
     _world[1].spot[4].y=219;
     _world[1].spot[5].x=337;
     _world[1].spot[5].y=74;
-    _world[1].intersect[0].x=741;//
-    _world[1].intersect[0].y=570;//
-    _world[1].intersect[1].x=741;//
-    _world[1].intersect[1].y=522;//
-    _world[1].intersect[2].x=510;//
-    _world[1].intersect[2].y=522;//
-    _world[1].intersect[3].x=510;//
+    _world[1].intersect[0].x=741;
+    _world[1].intersect[0].y=570;
+    _world[1].intersect[1].x=741;
+    _world[1].intersect[1].y=522;
+    _world[1].intersect[2].x=510;
+    _world[1].intersect[2].y=522;
+    _world[1].intersect[3].x=510;
     _world[1].intersect[3].y=476;
-    _world[1].intersect[4].x=510;//
+    _world[1].intersect[4].x=510;
     _world[1].intersect[4].y=384;
-    _world[1].intersect[5].x=510;//
-    _world[1].intersect[5].y=338;//
-    _world[1].intersect[6].x=272;//
-    _world[1].intersect[6].y=338;//
+    _world[1].intersect[5].x=510;
+    _world[1].intersect[5].y=338;
+    _world[1].intersect[6].x=272;
+    _world[1].intersect[6].y=338;
     _world[1].intersect[7].x=272;
     _world[1].intersect[7].y=219;
-    _world[1].intersect[8].x=272;//
-    _world[1].intersect[8].y=99;//
-    _world[1].intersect[9].x=337;//
-    _world[1].intersect[9].y=99;//
-    _world[1].intersect[10].x=337;//
-    _world[1].intersect[10].y=74;//
+    _world[1].intersect[8].x=272;
+    _world[1].intersect[8].y=99;
+    _world[1].intersect[9].x=337;
+    _world[1].intersect[9].y=99;
+    _world[1].intersect[10].x=337;
+    _world[1].intersect[10].y=74;
     _world[1].intersect[11].x=0;
     _world[1].intersect[11].y=0;
     _world[1].intersect[12].x=0;
@@ -574,7 +634,7 @@ void initworld()
         _world[2].intersect[i].level=-1;
         _world[2].intersect[i]._end=0;
         _world[2].intersect[i]._start=0;
-        _world[2].intersect[i]._escape=1;
+        _world[2].intersect[i]._escape=2;
         _world[2].intersect[i].esc=0;
         if(i<4)
             _world[2].intersect[i].enter=1;
@@ -648,10 +708,11 @@ void adjustenter(position now)
                     break;
                 }
             }
-        }
-        if(i==three && now._escape==enterworld && now._escape<2)
-        {
-            enterworld+=1;
+            if(i==three && now._escape==enterworld && now._escape<2)
+            {
+                enterworld+=1;
+                break;
+            }
         }
     }
     return;
@@ -672,11 +733,12 @@ void initend()
     _storyplot[3]=IMG_Load("images/end3.png");
     _storyplot[4]=IMG_Load("images/end4.png");
 }
+void alphamode();//newtext
 void begin_story()
 {
     for(int i=0;i<5;i++)
     {
-        beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[i]);//­I´º
+        beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[i]);
         SDL_RenderCopy(world_renderer,beginstory_texture,NULL,NULL);
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(beginstory_texture);
@@ -694,6 +756,7 @@ void begin_story()
             {
                 if(e.key.keysym.sym==SDLK_SPACE)
                 {
+                    if(i==0)alphamode();//newtext
                     b=0;
                     break;
                 }
@@ -734,4 +797,48 @@ void end_story()
         }
         }
     }
+    hungyun=IMG_Load("images/hungyun2.png");
+    hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);
+}
+void alphamode()//newtext
+{
+    SDL_SetRenderDrawColor(world_renderer,0xFF,0xFF,0xFF,0xFF);
+    Uint8 alp=255;
+    beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[0]);
+    SDL_SetTextureBlendMode(beginstory_texture,SDL_BLENDMODE_BLEND);
+    for(int i=0;i<255;i++)
+    {
+        alp-=1;
+        SDL_RenderClear(world_renderer);
+        SDL_SetTextureAlphaMod(beginstory_texture,alp);
+        SDL_RenderCopy(world_renderer,beginstory_texture,NULL,NULL);
+        SDL_RenderPresent(world_renderer);
+        SDL_Delay(6);
+    }
+    SDL_DestroyTexture(beginstory_texture);
+    static SDL_Surface* white=IMG_Load("images/white.png");
+    beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,white);
+    SDL_RenderCopy(world_renderer,beginstory_texture,NULL,NULL);
+    SDL_Delay(1000);
+    SDL_RenderPresent(world_renderer);
+    SDL_Delay(1000);
+    SDL_RenderClear(world_renderer);
+    SDL_DestroyTexture(beginstory_texture);
+    beginstory_texture=SDL_CreateTextureFromSurface(world_renderer,storyplot[1]);
+    Uint8 alpha=0;
+    SDL_SetTextureBlendMode(beginstory_texture,SDL_BLENDMODE_BLEND);
+    for(int i=0;i<255;i++)
+    {
+        alpha+=1;
+        SDL_RenderClear(world_renderer);
+        SDL_SetTextureAlphaMod(beginstory_texture,alpha);
+        SDL_RenderCopy(world_renderer,beginstory_texture,NULL,NULL);
+        SDL_RenderPresent(world_renderer);
+        if(i>50)
+            SDL_Delay(6);
+        else
+            SDL_Delay(25);
+    }
+    SDL_DestroyTexture(beginstory_texture);
+    return;
 }
