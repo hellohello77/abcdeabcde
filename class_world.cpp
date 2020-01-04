@@ -12,17 +12,17 @@ SDL_Surface* storyplot[5]={};//begin
 SDL_Texture* beginstory_texture=NULL;//begin
 SDL_Surface* hungyun=NULL;//world
 SDL_Surface* spotcircle=NULL;//world
-SDL_Surface* startcircle=NULL;//world
-SDL_Surface* gocircle=NULL;//world
-SDL_Surface* helpcircle=NULL;//world
+SDL_Surface* startcircle=NULL;//newtext
+SDL_Surface* gocircle=NULL;//newtext
+SDL_Surface* helpcircle=NULL;//newtext
 SDL_Surface* settingssurface=NULL;//world
-SDL_Rect world_hung_rect,settings_rect,nonsettings_rect,level_rect[10];//world
+SDL_Rect world_hung_rect,settings_rect,nonsettings_rect,level_rect[10];//newtext
 SDL_Texture* background_texture=NULL;//world
 SDL_Texture* hung_texture=NULL;//world
 SDL_Texture* spotcircle_texture=NULL;//world
 SDL_Texture* settings_texture=NULL;//world
-SDL_Texture* level_texture=NULL;//world
-SDL_Surface* level_surface[10]={};//world
+SDL_Texture* level_texture=NULL;//newtext
+SDL_Surface* level_surface[10]={};//newtext
 int enterworld=0;//world
 bool sett=0;//world
 SDL_Surface* _storyplot[5]={};//end
@@ -45,7 +45,7 @@ class world
     position spot[6],character,intersect[15];//已修改,character為初始位置，不能改
     SDL_Surface* world_background;
     bool _help,_ending;
-    void scene(position* now)//已修改
+    void scene(position* now)
     {
         SDL_SetRenderDrawColor(world_renderer,0x00,0x00,0x00,0xFF);
         SDL_RenderClear(world_renderer);
@@ -56,7 +56,7 @@ class world
         world_hung_rect.x=(now->x)-30;world_hung_rect.y=(now->y)-40;//宏
         hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);//宏
         SDL_RenderCopy(world_renderer,hung_texture,NULL,&world_hung_rect);//宏
-        if(now->level>-1)
+        if(now->level>-1)//newtext 整個if
         {
             if(now->level!=0)
             {
@@ -85,8 +85,8 @@ class world
         SDL_RenderPresent(world_renderer);
         SDL_DestroyTexture(background_texture);
         background_texture=NULL;
-        SDL_DestroyTexture(level_texture);
-        level_texture=NULL;
+        SDL_DestroyTexture(level_texture);//newtext
+        level_texture=NULL;//newtext
         SDL_DestroyTexture(hung_texture);
         hung_texture=NULL;
         SDL_FreeSurface(settingssurface);
@@ -199,7 +199,7 @@ class world
             }
         }
     }
-    void drawspot()
+    void drawspot()//newtext 整個function
     {
         for(int i=0;i<6;i++)
         {
@@ -462,17 +462,17 @@ int main(int argc, char* argv[])
 }
 void initworld()
 {
-    level_surface[0]=IMG_Load("images/1-0.png");
-    level_surface[1]=IMG_Load("images/1-1.png");
-    level_surface[2]=IMG_Load("images/1-2.png");
-    level_surface[3]=IMG_Load("images/1-3.png");
-    level_surface[4]=IMG_Load("images/2-1.png");
-    level_surface[5]=IMG_Load("images/2-2.png");
-    level_surface[6]=IMG_Load("images/2-3.png");
-    level_surface[7]=IMG_Load("images/3-1.png");
-    level_surface[8]=IMG_Load("images/3-2.png");
-    level_surface[9]=IMG_Load("images/3-3.png");
-    for(int i=0;i<10;i++)
+    level_surface[0]=IMG_Load("images/1-0.png");//newtext
+    level_surface[1]=IMG_Load("images/1-1.png");//newtext
+    level_surface[2]=IMG_Load("images/1-2.png");//newtext
+    level_surface[3]=IMG_Load("images/1-3.png");//newtext
+    level_surface[4]=IMG_Load("images/2-1.png");//newtext
+    level_surface[5]=IMG_Load("images/2-2.png");//newtext
+    level_surface[6]=IMG_Load("images/2-3.png");//newtext
+    level_surface[7]=IMG_Load("images/3-1.png");//newtext
+    level_surface[8]=IMG_Load("images/3-2.png");//newtext
+    level_surface[9]=IMG_Load("images/3-3.png");//newtext
+    for(int i=0;i<10;i++)//newtext
     {
         level_rect[i].w=250;
         level_rect[i].h=190;
@@ -485,9 +485,9 @@ void initworld()
     _world[2]._help=0;_world[2]._ending=0;
     hungyun=IMG_Load("images/hungyun.png");
     spotcircle=IMG_Load("images/spotcircle.png");
-    startcircle=IMG_Load("images/START.png");
-    helpcircle=IMG_Load("images/HELP.png");
-    gocircle=IMG_Load("images/GO.png");
+    startcircle=IMG_Load("images/START.png");//newtext
+    helpcircle=IMG_Load("images/HELP.png");//newtext
+    gocircle=IMG_Load("images/GO.png");//newtext
     for(int i=1;i<3;i++)
     {
         _world[i].spot[0].x=0;
@@ -797,8 +797,8 @@ void end_story()
         }
         }
     }
-    hungyun=IMG_Load("images/hungyun2.png");
-    hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);
+    hungyun=IMG_Load("images/hungyun2.png");//newtext
+    hung_texture=SDL_CreateTextureFromSurface(world_renderer,hungyun);//newtext
 }
 void alphamode()//newtext
 {
